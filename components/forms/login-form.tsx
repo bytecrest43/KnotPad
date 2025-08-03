@@ -21,7 +21,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // ✅ Added
+import { useRouter } from "next/navigation"; 
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -66,7 +66,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter(); // ✅ Added
+  const router = useRouter(); 
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,7 +83,7 @@ export function LoginForm({
 
       if (response.success) {
         toast.success(response.message);
-        router.push("/dashboard"); // ✅ Redirect on successful login
+        router.push("/dashboard");
       } else {
         toast.error(response.message);
       }

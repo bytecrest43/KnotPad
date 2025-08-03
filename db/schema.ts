@@ -3,7 +3,6 @@ import {
   text,
   timestamp,
   boolean,
-  integer,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -65,3 +64,10 @@ export const verification = pgTable("verification", {
     () => /* @__PURE__ */ new Date(),
   ),
 });
+
+export const schema = {
+  user,
+  session,
+  account,
+  verification,
+};

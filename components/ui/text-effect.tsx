@@ -1,4 +1,5 @@
 'use client';
+
 import { cn } from '@/lib/utils';
 import {
   AnimatePresence,
@@ -9,11 +10,10 @@ import type {
   Transition,
   Variant,
   Variants,
-} from 'motion/react'
+} from 'motion/react';
 import React from 'react';
 
 export type PresetType = 'blur' | 'fade-in-blur' | 'scale' | 'fade' | 'slide';
-
 export type PerType = 'word' | 'char' | 'line';
 
 export type TextEffectProps = {
@@ -169,9 +169,7 @@ const hasTransition = (
   variant?: Variant
 ): variant is TargetAndTransition & { transition?: Transition } => {
   if (!variant) return false;
-  return (
-    typeof variant === 'object' && 'transition' in variant
-  );
+  return typeof variant === 'object' && 'transition' in variant;
 };
 
 const createVariantsWithTransition = (
@@ -180,7 +178,8 @@ const createVariantsWithTransition = (
 ): Variants => {
   if (!transition) return baseVariants;
 
-  const { exit: _, ...mainTransition } = transition;
+
+  const { exit, ...mainTransition } = transition;
 
   return {
     ...baseVariants,
@@ -232,7 +231,6 @@ export function TextEffect({
     : { container: defaultContainerVariants, item: defaultItemVariants };
 
   const stagger = defaultStaggerTimes[per] / speedReveal;
-
   const baseDuration = 0.3 / speedSegment;
 
   const customStagger = hasTransition(variants?.container?.visible ?? {})

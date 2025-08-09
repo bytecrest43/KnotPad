@@ -5,6 +5,7 @@ import Image from "next/image";
 import { TextEffect } from "@/components/ui/text-effect";
 import { AnimatedGroup } from "@/components/ui/animated-group";
  import { HeroHeader } from "./header";
+ 
 
 const transitionVariants = {
   item: {
@@ -18,7 +19,7 @@ const transitionVariants = {
       filter: "blur(0px)",
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as any,
         bounce: 0.3,
         duration: 1.5,
       },
@@ -48,7 +49,7 @@ export default function HeroSection() {
                   preset="fade-in-blur"
                   speedSegment={0.3}
                   as="h1"
-                  className="mt-8 max-w-2xl text-balance text-3xl font-medium md:text-4xl lg:mt-16"
+                  className="mt-8 max-w-2xl text-balance text-5xl font-medium md:text-6xl lg:mt-16"
                 >
                   🐦‍🔥 Organize Your Ideas. Capture Your Thoughts. KnotPad
                   It.

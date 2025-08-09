@@ -1,11 +1,10 @@
 import React from "react";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { TextEffect } from "@/components/ui/text-effect";
 import { AnimatedGroup } from "@/components/ui/animated-group";
-import { HeroHeader } from "./header";
+ import { HeroHeader } from "./header";
 
 const transitionVariants = {
   item: {
@@ -49,7 +48,7 @@ export default function HeroSection() {
                   preset="fade-in-blur"
                   speedSegment={0.3}
                   as="h1"
-                  className="mt-8 max-w-2xl text-balance text-5xl font-medium md:text-6xl lg:mt-16"
+                  className="mt-8 max-w-2xl text-balance text-3xl font-medium md:text-4xl lg:mt-16"
                 >
                   🐦‍🔥 Organize Your Ideas. Capture Your Thoughts. KnotPad
                   It.
@@ -90,7 +89,7 @@ export default function HeroSection() {
                       size="lg"
                       className="rounded-xl px-5 text-base"
                     >
-                      <Link href="#link">
+                      <Link href="/dashboard">
                         <span className="text-nowrap">Start Writing</span>
                       </Link>
                     </Button>
@@ -102,9 +101,7 @@ export default function HeroSection() {
                     variant="ghost"
                     className="h-10.5 rounded-xl px-5 text-base"
                   >
-                    <Link href="#link">
-                      <span className="text-nowrap">Request a demo</span>
-                    </Link>
+                    
                   </Button>
                 </AnimatedGroup>
               </div>
@@ -130,14 +127,14 @@ export default function HeroSection() {
                 <div className="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-5xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
                   <Image
                     className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
-                    src="/mail2.png"
+                    src="/app-screen-dark.png"
                     alt="app screen"
                     width="2700"
                     height="1440"
                   />
                   <Image
                     className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
-                    src="/mail2-light.png"
+                    src="/app-screen-light.png"
                     alt="app screen"
                     width="2700"
                     height="1440"

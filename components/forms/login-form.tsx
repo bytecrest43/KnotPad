@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation"; 
+import { authClient } from "@/lib/auth-client";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -32,7 +33,7 @@ const GoogleLoginButton = ({ onClick }: { onClick?: () => void }) => (
   <Button
     variant="outline"
     type="button"
-    className="w-full flex items-center justify-center gap-3"
+    className="w-full flex items-center justify-center gap-3 cursor-pointer"
     onClick={onClick}
   >
     <svg
@@ -61,6 +62,7 @@ const GoogleLoginButton = ({ onClick }: { onClick?: () => void }) => (
   </Button>
 );
 
+
 export function LoginForm({
   className,
   ...props
@@ -75,6 +77,13 @@ export function LoginForm({
       password: "",
     },
   });
+      
+  const signIn = async () => {
+     await authClient.signIn.social({
+        provider: "google",
+        callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`,
+    });
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -152,7 +161,7 @@ export function LoginForm({
                   />
 
                   {/* Submit */}
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
                     {isLoading ? <Loader2 className="size-4 animate-spin" /> : "Login"}
                   </Button>
 
@@ -165,7 +174,7 @@ export function LoginForm({
 
                   {/* Google Button */}
                   <div className="grid grid-cols-1 gap-4">
-                    <GoogleLoginButton />
+                    <GoogleLoginButton onClick={signIn}/>
                   </div>
 
                   {/* Signup link */}
@@ -183,7 +192,7 @@ export function LoginForm({
           {/* Image */}
           <div className="bg-muted relative hidden md:block">
             <Image
-              src="/Login.gif"
+              src="/login.png"
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.7] dark:grayscale"
               width={2500}

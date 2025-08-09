@@ -1,4 +1,3 @@
-// logout.tsx
 "use client";
 
 import { authClient } from "@/lib/auth-client";
@@ -10,8 +9,8 @@ export function Logout() {
 
   const handleLogout = async () => {
     try {
-      await authClient.signOut(); // Clears session cookie
-      router.push("/");           // Redirects to home
+      await authClient.signOut(); 
+      router.push("/");          
     } catch (err) {
       console.error("Logout failed:", err);
     }

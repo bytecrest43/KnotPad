@@ -16,11 +16,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import {  signUpUser } from "@/server/users";
+import { signUpUser } from "@/server/users";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
 
 // Validation schema
 const formSchema = z
@@ -40,7 +41,11 @@ const GoogleSignUpButton = ({ onClick }: { onClick?: () => void }) => (
   <Button
     type="button"
     variant="outline"
-    className="w-full flex items-center justify-center gap-3"
+    className="w-full 
+    flex items-center
+     justify-center
+     gap-3
+      cursor-pointer"
     onClick={onClick}
   >
     <svg
@@ -104,6 +109,13 @@ export function SignUpForm({
     }
   }
 
+    const signUp = async () => {
+       await authClient.signIn.social({
+          provider: "google",
+          callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`,
+      });
+    };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="mx-auto w-full max-w-5xl">
@@ -119,7 +131,8 @@ export function SignUpForm({
                     <div className="flex flex-col items-center text-center">
                       <h1 className="text-2xl font-bold">Sign up</h1>
                       <p className="text-muted-foreground text-balance">
-                        Create an account to start organizing your notes and tasks.
+                        Create an account to start organizing your notes and
+                        tasks.
                       </p>
                     </div>
 
@@ -146,7 +159,11 @@ export function SignUpForm({
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="mail@example.com" {...field} />
+                            <Input
+                              type="email"
+                              placeholder="mail@example.com"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -161,7 +178,11 @@ export function SignUpForm({
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -176,7 +197,11 @@ export function SignUpForm({
                         <FormItem>
                           <FormLabel>Confirm Password</FormLabel>
                           <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -184,8 +209,16 @@ export function SignUpForm({
                     />
 
                     {/* Submit Button */}
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? <Loader2 className="size-4 animate-spin" /> : "Sign up"}
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        "Sign up"
+                      )}
                     </Button>
 
                     {/* Divider */}
@@ -197,12 +230,15 @@ export function SignUpForm({
 
                     {/* Google Button */}
                     <div className="grid grid-cols-1 gap-4">
-                      <GoogleSignUpButton />
+                      <GoogleSignUpButton onClick={signUp} />
                     </div>
 
                     <div className="text-center text-sm">
                       Already have an account?{" "}
-                      <Link href="/login" className="underline underline-offset-4">
+                      <Link
+                        href="/login"
+                        className="underline underline-offset-4"
+                      >
                         Login
                       </Link>
                     </div>

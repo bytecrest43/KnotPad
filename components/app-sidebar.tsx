@@ -36,7 +36,7 @@ export async function AppSidebar({
     <Sidebar {...props}>
       <SidebarHeader>
         <Link href="/" className="flex items-center gap-2 pl-2">
-          <Image src="/knot.png" alt="Logo" width={32} height={32} />
+          <Image src="/knot.png" alt="Logo" width={48} height={48} />
           <h2>KnotPad</h2>
         </Link>
 

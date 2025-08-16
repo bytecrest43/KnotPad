@@ -110,10 +110,15 @@ export function SignUpForm({
   }
 
     const signUp = async () => {
-       await authClient.signIn.social({
+      try {
+        await authClient.signIn.social({
           provider: "google",
-          callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`,
-      });
+          callbackURL: "/dashboard",
+        });
+      } catch (e) {
+        console.error("Google sign-up failed", e);
+        toast.error("Failed to start Google sign up. Please try again.");
+      }
     };
 
   return (

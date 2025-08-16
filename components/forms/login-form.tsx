@@ -79,10 +79,17 @@ export function LoginForm({
   });
       
   const signIn = async () => {
-     await authClient.signIn.social({
+    try {
+      const callback = typeof window !== "undefined" ? `${window.location.origin}/dashboard` : "/dashboard";
+      await authClient.signIn.social({
         provider: "google",
-        callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`,
-    });
+        callbackURL: callback,
+      });
+    } catch (e) {
+      console.error("Google sign-in failed", e);
+      const message = e instanceof Error ? e.message : "Failed to start Google sign-in. Please try again.";
+      toast.error(message);
+    }
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

@@ -1,7 +1,13 @@
+"use client";
+
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { authClient } from '@/lib/auth-client';
 
 export default function CallToAction() {
+  const { data } = authClient.useSession();
+  const targetHref = data?.user ? "/dashboard" : "/login";
+
   return (
     <section className="py-16 md:py-32">
       <div className="mx-auto max-w-5xl px-6">
@@ -15,7 +21,7 @@ export default function CallToAction() {
 
           <div className="mt-12 flex flex-wrap justify-center gap-4">
             <Button asChild size="lg">
-              <Link href="/dashboard">
+              <Link href={targetHref}>
                 <span>🌟 Get Started</span>
               </Link>
             </Button>

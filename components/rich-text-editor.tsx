@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useRef } from "react";
 import {
   useEditor,
   EditorContent,
@@ -11,6 +12,11 @@ import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
+import UnderlineExtension from "@tiptap/extension-underline";
+import LinkExtension from "@tiptap/extension-link";
+import SubscriptExtension from "@tiptap/extension-subscript";
+import SuperscriptExtension from "@tiptap/extension-superscript";
+import TextAlign from "@tiptap/extension-text-align";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -25,8 +31,8 @@ import {
   Italic,
   Strikethrough,
   Code,
-  Underline,
-  Link,
+  Underline as UnderlineIcon,
+  Link as LinkIcon,
   List,
   ListOrdered,
   AlignLeft,
@@ -41,91 +47,118 @@ import {
 import { updateNote } from "@/server/notes";
 
 interface RichTextEditorProps {
-  content?: JSONContent[];
+  content?: JSONContent;
   noteId?: string;
 }
 
 const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
+  // sanitize incoming content: ensure it's a valid TipTap doc
+  const initialContent: JSONContent | undefined =
+    content && (content as JSONContent).type === "doc" ? (content as JSONContent) : undefined;
+
+  // debounce editor updates to reduce API chatter and improve responsiveness
+  const updateTimer = useRef<number | null>(null);
+
   const editor = useEditor({
-    extensions: [StarterKit, Document, Paragraph, Text],
+    extensions: [
+      StarterKit,
+      Document,
+      Paragraph,
+      Text,
+      UnderlineExtension,
+      LinkExtension.configure({
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        protocols: ["http", "https", "mailto", "tel"],
+      }),
+      SubscriptExtension,
+      SuperscriptExtension,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+    ],
     immediatelyRender: false,
     autofocus: true,
     editable: true,
-    injectCSS: false,
+    injectCSS: true,
     onUpdate: ({ editor }) => {
-      if (noteId) {
-        const content = editor.getJSON();
-        updateNote(noteId, { content });
+      if (!noteId) return;
+      const content = editor.getJSON();
+      if (updateTimer.current) {
+        window.clearTimeout(updateTimer.current);
       }
+      updateTimer.current = window.setTimeout(() => {
+        updateNote(noteId, { content });
+      }, 500);
     },
-    content: content ?? {
-      type: "doc",
-      content: [
-        {
-          type: "heading",
-          attrs: { level: 1 },
-          content: [{ type: "text", text: "Getting started" }],
-        },
-        {
-          type: "paragraph",
-          content: [
-            { type: "text", text: "Welcome to the " },
-            {
-              type: "text",
-              text: "Simple Editor",
-              marks: [{ type: "italic" }],
-            },
-            { type: "text", text: " template! This template integrates " },
-            { type: "text", text: "open source", marks: [{ type: "bold" }] },
-            {
-              type: "text",
-              text: " UI components and Tiptap extensions licensed under ",
-            },
-            { type: "text", text: "MIT", marks: [{ type: "bold" }] },
-            { type: "text", text: "." },
-          ],
-        },
-        {
-          type: "paragraph",
-          content: [
-            { type: "text", text: "Integrate it by following the " },
-            {
-              type: "text",
-              text: "Tiptap UI Components docs",
-              marks: [{ type: "code" }],
-            },
-            { type: "text", text: " or using our CLI tool." },
-          ],
-        },
-        {
-          type: "codeBlock",
-          content: [{ type: "text", text: "npx @tiptap/cli init" }],
-        },
-        {
-          type: "heading",
-          attrs: { level: 2 },
-          content: [{ type: "text", text: "Features" }],
-        },
-        {
-          type: "blockquote",
-          content: [
-            {
-              type: "paragraph",
-              content: [
-                {
-                  type: "text",
-                  text: "A fully responsive rich text editor with built-in support for common formatting and layout tools. Type markdown ",
-                },
-                { type: "text", text: "**", marks: [{ type: "bold" }] },
-                { type: "text", text: " or use keyboard shortcuts " },
-                { type: "text", text: "⌘+B", marks: [{ type: "code" }] },
-                { type: "text", text: " for most all common markdown marks." },
-              ],
-            },
-          ],
-        },
-      ],
-    },
+    content:
+      initialContent ?? {
+        type: "doc",
+        content: [
+          {
+            type: "heading",
+            attrs: { level: 1 },
+            content: [{ type: "text", text: "Getting started" }],
+          },
+          {
+            type: "paragraph",
+            content: [
+              { type: "text", text: "Welcome to the " },
+              {
+                type: "text",
+                text: "Simple Editor",
+                marks: [{ type: "italic" }],
+              },
+              { type: "text", text: " template! This template integrates " },
+              { type: "text", text: "open source", marks: [{ type: "bold" }] },
+              {
+                type: "text",
+                text: " UI components and Tiptap extensions licensed under ",
+              },
+              { type: "text", text: "MIT", marks: [{ type: "bold" }] },
+              { type: "text", text: "." },
+            ],
+          },
+          {
+            type: "paragraph",
+            content: [
+              { type: "text", text: "Integrate it by following the " },
+              {
+                type: "text",
+                text: "Tiptap UI Components docs",
+                marks: [{ type: "code" }],
+              },
+              { type: "text", text: " or using our CLI tool." },
+            ],
+          },
+          {
+            type: "codeBlock",
+            content: [{ type: "text", text: "pnpm dlx @tiptap/cli init" }],
+          },
+          {
+            type: "heading",
+            attrs: { level: 2 },
+            content: [{ type: "text", text: "Features" }],
+          },
+          {
+            type: "blockquote",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    text: "A fully responsive rich text editor with built-in support for common formatting and layout tools. Type markdown ",
+                  },
+                  { type: "text", text: "**", marks: [{ type: "bold" }] },
+                  { type: "text", text: " or use keyboard shortcuts " },
+                  { type: "text", text: "⌘+B", marks: [{ type: "code" }] },
+                  { type: "text", text: " for most all common markdown marks." },
+                ],
+              },
+            ],
+          },
+        ],
+      },
   });
 
   const editorState = useEditorState({
@@ -141,6 +174,9 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         canStrike: ctx.editor?.can().chain().focus().toggleStrike().run(),
         isCode: ctx.editor?.isActive("code"),
         canCode: ctx.editor?.can().chain().focus().toggleCode().run(),
+        isUnderline: ctx.editor?.isActive("underline"),
+        canUnderline: ctx.editor?.can().chain().focus().toggleUnderline().run(),
+        isLink: ctx.editor?.isActive("link"),
         isParagraph: ctx.editor?.isActive("paragraph"),
         isHeading1: ctx.editor?.isActive("heading", { level: 1 }),
         isHeading2: ctx.editor?.isActive("heading", { level: 2 }),
@@ -149,6 +185,10 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         isOrderedList: ctx.editor?.isActive("orderedList"),
         isCodeBlock: ctx.editor?.isActive("codeBlock"),
         isBlockquote: ctx.editor?.isActive("blockquote"),
+        alignLeft: ctx.editor?.isActive({ textAlign: "left" }),
+        alignCenter: ctx.editor?.isActive({ textAlign: "center" }),
+        alignRight: ctx.editor?.isActive({ textAlign: "right" }),
+        alignJustify: ctx.editor?.isActive({ textAlign: "justify" }),
         canUndo: ctx.editor?.can().chain().focus().undo().run(),
         canRedo: ctx.editor?.can().chain().focus().redo().run(),
       };
@@ -165,7 +205,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
   return (
     <div className="w-full max-w-7xl bg-card text-card-foreground rounded-lg overflow-hidden border">
       {/* Toolbar */}
-      <div className="flex items-center gap-1 p-2 bg-muted/50 border-b">
+      <div className="flex items-center gap-1 p-2 bg-muted/50 border-b sticky top-0 z-20 overflow-x-auto flex-nowrap touch-pan-x select-none backdrop-blur supports-[backdrop-filter]:bg-muted/70 [&_button]:h-10 [&_button]:w-10 md:[&_button]:h-8 md:[&_button]:w-8">
         {/* Undo/Redo */}
         <Button
           variant="ghost"
@@ -318,9 +358,15 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         <Button
           variant="ghost"
           size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
+          onClick={() => editor?.chain().focus().toggleUnderline().run()}
+          disabled={!editorState?.canUnderline}
+          className={`size-8 p-0 hover:bg-accent ${
+            editorState?.isUnderline
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
         >
-          <Underline className="h-4 w-4" />
+          <UnderlineIcon className="h-4 w-4" />
         </Button>
 
         <div className="w-px h-6 bg-border mx-1" />
@@ -329,13 +375,33 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         <Button
           variant="ghost"
           size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
+          onClick={() => {
+            if (!editor) return;
+            if (editor.isActive("link")) {
+              editor.chain().focus().unsetLink().run();
+              return;
+            }
+            const previousUrl = editor.getAttributes("link").href as string | undefined;
+            const url = window.prompt("Enter URL", previousUrl ?? "https://");
+            if (url === null) return; // cancelled
+            if (url === "") {
+              editor.chain().focus().unsetLink().run();
+              return;
+            }
+            editor.chain().focus().setLink({ href: url }).run();
+          }}
+          className={`size-8 p-0 hover:bg-accent ${
+            editorState?.isLink
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
         >
-          <Link className="h-4 w-4" />
+          <LinkIcon className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
           size="sm"
+          onClick={() => editor?.chain().focus().toggleSuperscript().run()}
           className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
         >
           <Superscript className="h-4 w-4" />
@@ -343,6 +409,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         <Button
           variant="ghost"
           size="sm"
+          onClick={() => editor?.chain().focus().toggleSubscript().run()}
           className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
         >
           <Subscript className="h-4 w-4" />
@@ -354,28 +421,48 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         <Button
           variant="ghost"
           size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
+          onClick={() => editor?.chain().focus().setTextAlign("left").run()}
+          className={`size-8 p-0 hover:bg-accent ${
+            editorState?.alignLeft
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
         >
           <AlignLeft className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
+          onClick={() => editor?.chain().focus().setTextAlign("center").run()}
+          className={`size-8 p-0 hover:bg-accent ${
+            editorState?.alignCenter
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
         >
           <AlignCenter className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
+          onClick={() => editor?.chain().focus().setTextAlign("right").run()}
+          className={`size-8 p-0 hover:bg-accent ${
+            editorState?.alignRight
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
         >
           <AlignRight className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
+          onClick={() => editor?.chain().focus().setTextAlign("justify").run()}
+          className={`size-8 p-0 hover:bg-accent ${
+            editorState?.alignJustify
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
         >
           <AlignJustify className="h-4 w-4" />
         </Button>
@@ -395,10 +482,10 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
       </div>
 
       {/* Editor Content */}
-      <div className="min-h-96 p-6 bg-card">
+      <div className="min-h-[60vh] sm:min-h-96 p-4 sm:p-6 bg-card focus-within:ring-1 focus-within:ring-ring overscroll-y-contain pb-[max(6rem,env(safe-area-inset-bottom))] sm:pb-8">
         <EditorContent
           editor={editor}
-          className="prose prose-neutral dark:prose-invert max-w-none focus:outline-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-96 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_p]:mb-4 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_code]:bg-muted [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:rounded"
+          className="prose prose-neutral dark:prose-invert max-w-none cursor-text focus:outline-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-[60vh] sm:[&_.ProseMirror]:min-h-96 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_p]:mb-4 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_code]:bg-muted [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:rounded"
         />
       </div>
     </div>

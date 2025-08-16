@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { useScroll } from "framer-motion";
+import { useScroll } from 'motion/react';
 import Image from "next/image";
 import { ModeSwitcher } from "./mode-switcher";
 

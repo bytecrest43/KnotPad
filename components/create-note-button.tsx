@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createNote } from "@/server/notes";
@@ -38,6 +38,7 @@ export const CreateNoteButton = ({ notebookId }: { notebookId: string }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,18 +50,22 @@ export const CreateNoteButton = ({ notebookId }: { notebookId: string }) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsLoading(true);
+      // Close immediately for snappier UI
+      setIsOpen(false);
 
       const response = await createNote({
         title: values.name,
-        content: {},
+        content: { type: "doc", content: [{ type: "paragraph" }] },
         notebookId,
       });
 
       if (response.success) {
         form.reset();
         toast.success("Note created successfully");
-        router.refresh();
-        setIsOpen(false);
+        // Defer refresh so it doesn't block urgent updates
+        startTransition(() => {
+          router.refresh();
+        });
       } else {
         toast.error(response.message);
       }
@@ -74,7 +79,7 @@ export const CreateNoteButton = ({ notebookId }: { notebookId: string }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="w-max">Create Note</Button>
+        <Button type="button" className="w-max">Create Note</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -99,8 +104,8 @@ export const CreateNoteButton = ({ notebookId }: { notebookId: string }) => {
                 </FormItem>
               )}
             />
-            <Button disabled={isLoading} type="submit">
-              {isLoading ? (
+            <Button disabled={isLoading || isPending} type="submit">
+              {isLoading || isPending ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 "Create"

@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { createNotebook } from "@/server/notebooks";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -39,6 +39,7 @@ export const CreateNotebookButton = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,6 +58,9 @@ export const CreateNotebookButton = () => {
         return;
       }
 
+      // Close immediately for responsiveness
+      setIsOpen(false);
+
       const response = await createNotebook({
         ...values,
         userId,
@@ -64,8 +68,9 @@ export const CreateNotebookButton = () => {
       if (response.success) {
         form.reset();
         toast.success("Notebook created successfully");
-        router.refresh();
-        setIsOpen(false);
+        startTransition(() => {
+          router.refresh();
+        });
       } else {
         toast.error(response.message);
       }
@@ -79,7 +84,7 @@ export const CreateNotebookButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="w-max">Create Notebook</Button>
+        <Button type="button" className="w-max">Create Notebook</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -104,8 +109,8 @@ export const CreateNotebookButton = () => {
                 </FormItem>
               )}
             />
-            <Button disabled={isLoading} type="submit">
-              {isLoading ? (
+            <Button disabled={isLoading || isPending} type="submit">
+              {isLoading || isPending ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 "Create"

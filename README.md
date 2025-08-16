@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KnotPad
 
-## Getting Started
+Organize your ideas, capture your thoughts, and structure your notes exactly how your mind works — all in one clean, powerful workspace. KnotPad is a structured note‑taking app built with Next.js and React. It features notebooks/folders, a modern rich text editor, authentication, dark mode, and a focus on performance.
 
-First, run the development server:
+![KnotPad App Screenshot](public/app-screen-dark.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
+- Structured notebooks and notes to keep everything organized
+- Rich text editor powered by TipTap (formatting, links, underline, align, sub/superscript, etc.)
+- Authentication with email/password and Google (BetterAuth)
+- Email verification and password reset via Resend
+- PostgresSQL database with Drizzle ORM
+- Responsive UI, dark mode support, and polished UX animations
+- Performance‑minded setup (see Performance Audit below)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
+- Next.js 15 (App Router) and React 19
+- TypeScript, Tailwind CSS
+- Drizzle ORM + PostgresSQL (Neon or any Postgres)
+- BetterAuth (+ Google OAuth) and Resend for transactional emails
+- Framer Motion / Motion for animations
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Prerequisites
+- Node.js 18.18+ (or 20+ recommended)
+- Package manager: pnpm (Corepack-enabled)
+  - If needed: corepack enable && pnpm -v
+- A PostgresSQL database (e.g., Neon, Sup abase, local Postgres)
+- Resend account for emails (verification/reset)
+- Google OAuth credentials (optional but supported)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Quick Start
+1. Install dependencies
+   - pnpm install
+2. Configure environment variables (create .env at project root)
+   - DATABASE_URL=postgres://<user>:<password>@<host>:<port>/<db>
+   - RESEND_API_KEY=your_resend_api_key
+   - GOOGLE_CLIENT_ID=your_google_oauth_client_id
+   - GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
+   - NEXT_PUBLIC_BASE_URL=http://localhost:3000  (optional; used for API path building)
+3. Prepare the database schema (Drizzle)
+   - pnpm dlx drizzle-kit generate
+   - pnpm dlx drizzle-kit push
+4. Run the development server
+   - pnpm dev
+5. Open http://localhost:3000 in your browser
 
-## Learn More
+Notes
+- The app uses a dark and light screenshot in the UI; the README showcases public/app-screen-dark.png.
+- Outgoing emails are sent via Resend. Ensure the sending domain/address in code (lib/auth.ts) is configured for your account.
 
-To learn more about Next.js, take a look at the following resources:
+## Available Scripts
+- dev: next dev --turbo pack
+- build: next build
+- start: next start
+- lint: next lint
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables Summary
+- DATABASE_URL: Postgres connection string used by Drizzle
+- RESEND_API_KEY: API key for Resend to send verification and reset emails
+- GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: for Google login with BetterAuth
+- NEXT_PUBLIC_BASE_URL: optional; overrides base URL when building API paths in the client
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Performance Audit and Optimization
+See PERFORMANCE_AUDIT.md for the plan, target metrics (RESTFB, FCP, LCP, CLS, INP), and concrete optimizations in this repo (lazy-loaded editor, caching headers, next/font usage), plus recommended tools (Lighthouse, WebPageTest, Chrome DevTools) and strategies (caching, lazy loading, prefetching, minimizing reflows).
 
-## Deploy on Vercel
+## Deployment
+- Any Node‑capable host will work. For easiest deployment, use Vercel.
+- Ensure all environment variables are set on your host.
+- Run build then start (or use your platform’s build/start hooks).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+This project is provided as‑is for educational and personal use. Update licensing as needed for your use case.

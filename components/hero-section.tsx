@@ -1,13 +1,17 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { TextEffect } from "@/components/ui/text-effect";
 import { AnimatedGroup } from "@/components/ui/animated-group";
- import { HeroHeader } from "./header";
- 
+import { HeroHeader } from "./header";
+import { authClient } from "@/lib/auth-client";
 
-const transitionVariants = {
+import type { Variants } from "motion/react";
+
+const transitionVariants: { item: Variants } = {
   item: {
     hidden: {
       opacity: 0,
@@ -19,7 +23,7 @@ const transitionVariants = {
       filter: "blur(0px)",
       y: 0,
       transition: {
-        type: "spring" as any,
+        type: "spring",
         bounce: 0.3,
         duration: 1.5,
       },
@@ -28,6 +32,8 @@ const transitionVariants = {
 };
 
 export default function HeroSection() {
+  const { data } = authClient.useSession();
+  const targetHref = data?.user ? "/dashboard" : "/login";
   return (
     <>
       <HeroHeader />
@@ -90,7 +96,7 @@ export default function HeroSection() {
                       size="lg"
                       className="rounded-xl px-5 text-base"
                     >
-                      <Link href="/dashboard">
+                      <Link href={targetHref}>
                         <span className="text-nowrap">Start Writing</span>
                       </Link>
                     </Button>
@@ -130,15 +136,19 @@ export default function HeroSection() {
                     className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
                     src="/app-screen-dark.png"
                     alt="app screen"
-                    width="2700"
-                    height="1440"
+                    width={2700}
+                    height={1440}
+                    sizes="(max-width: 1024px) 100vw, 1024px"
+                    priority={false}
                   />
                   <Image
                     className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
                     src="/app-screen-light.png"
                     alt="app screen"
-                    width="2700"
-                    height="1440"
+                    width={2700}
+                    height={1440}
+                    sizes="(max-width: 1024px) 100vw, 1024px"
+                    priority={false}
                   />
                 </div>
               </div>

@@ -32,7 +32,7 @@ export default function FooterSection() {
         {/* Social Links */}
         <div className="mt-8 flex justify-center gap-6">
           <Link
-            href="#"
+            href="https://t.me/bytecrest43"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Telegram"
@@ -46,7 +46,7 @@ export default function FooterSection() {
             />
           </Link>
           <Link
-            href="#"
+            href="https://t.snapchat.com/SvQRYH6y"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Snapchat"
@@ -60,7 +60,7 @@ export default function FooterSection() {
             />
           </Link>
           <Link
-            href="#"
+            href="https://www.tiktok.com/@codememe43?_t=ZM-8yjq4hBghAW&_r=1"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="TikTok"
